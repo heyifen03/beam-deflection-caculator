@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>보 처짐 계산기</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: #f3f5f8;
+      color: #18202a;
+    }
+    header {
+      background: #17202a;
+      color: white;
+      padding: 28px 24px;
+    }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: #cbd5df; }
+
+    .container {
+      max-width: 1200px;
+      margin: 28px auto;
+      padding: 0 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.07);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 19px;
+      border-bottom: 1px solid #e5e9ee;
+      padding-bottom: 12px;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #cfd6df;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+    }
+
+    .unit {
+      color: #697586;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 9px;
+      padding: 13px;
+      background: #2563eb;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    button:hover { background: #1d4ed8; }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .result-box {
+      background: #f5f7fa;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .result-box span {
+      display: block;
+      color: #697586;
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+
+    .result-box strong {
+      font-size: 20px;
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 11px;
+      border-radius: 8px;
+      background: #fff7ed;
+      color: #9a3412;
+      display: none;
+      font-size: 13px;
+    }
+
+    #shapeFields { margin-top: 4px; }
+
+    canvas {
+      width: 100%;
+      height: 330px;
+      border: 1px solid #e1e5ea;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .formula {
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      padding: 12px 14px;
+      margin-top: 14px;
+      font-family: Georgia, serif;
+      font-size: 17px;
+    }
+
+    .note {
+      color: #697586;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: 1fr; }
+      .full { grid-column: auto; }
+      .result-grid { grid-template-columns: 1fr 1fr; }
+    }
+  
+/* ===== 고급 밝은 테마 ===== */
+body{
+ background:
+ radial-gradient(circle at 8% 0%,rgba(37,99,235,.07),transparent 26%),
+ radial-gradient(circle at 92% 8%,rgba(15,118,110,.055),transparent 24%),
+ #f1f4f8;
+ color:#182235;
+}
+header{
+ background:linear-gradient(135deg,#101a2d,#213653);
+ box-shadow:0 10px 35px rgba(17,31,54,.18);
+}
+.card{
+ background:rgba(255,255,255,.95);
+ border:1px solid #e0e6ef;
+ border-radius:17px;
+ box-shadow:0 16px 42px rgba(31,48,76,.09);
+}
+.option-card{
+ background:linear-gradient(180deg,#fff,#f8fafc);
+ border:1px solid #dce3ec;
+ border-radius:13px;
+}
+.option-card:hover{
+ border-color:#9dbcf0;
+ box-shadow:0 8px 22px rgba(37,99,235,.10);
+}
+.option-card.selected{
+ border-color:#2563eb;
+ background:linear-gradient(180deg,#fbfdff,#eef5ff);
+ box-shadow:0 8px 24px rgba(37,99,235,.12);
+}
+input,select{
+ border-color:#d5dce7;
+ border-radius:10px;
+}
+input:focus,select:focus{
+ border-color:#79a4ef;
+ box-shadow:0 0 0 4px rgba(37,99,235,.08);
+}
+button{
+ background:linear-gradient(135deg,#2563eb,#174fc7);
+ border-radius:11px;
+ box-shadow:0 9px 22px rgba(37,99,235,.20);
+}
+.result-box{
+ background:linear-gradient(145deg,#fff,#f7f9fc);
+ border:1px solid #e1e7ef;
+}
+.formula{
+ font-family:"Times New Roman","Noto Serif KR",serif;
+ font-size:23px;
+ min-height:64px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+}
+.frac{
+ display:inline-flex;
+ flex-direction:column;
+ vertical-align:middle;
+ text-align:center;
+ line-height:1.05;
+}
+.frac .top{
+ padding:0 10px 4px;
+ border-bottom:1.5px solid currentColor;
+}
+.frac .bottom{
+ padding:4px 10px 0;
+}
+
+
+.visual-choice-block{margin-top:4px;margin-bottom:22px}
+.visual-choice-block>label{display:block;margin-bottom:8px;font-size:13px;font-weight:800;color:#475569}
+.diagram-grid{display:grid;gap:10px}
+.beam-choice-grid{grid-template-columns:1fr 1fr}
+.load-choice-grid{grid-template-columns:repeat(3,1fr)}
+.section-choice-grid{grid-template-columns:repeat(4,1fr);margin-bottom:10px}
+.diagram-card{
+ position:relative;min-height:112px;padding:7px 7px 9px;
+ border:1px solid #dce3ec;border-radius:13px;
+ background:linear-gradient(180deg,#fff,#f8fafc);
+ cursor:pointer;text-align:center;transition:.2s ease;
+}
+.diagram-card:hover{transform:translateY(-2px);border-color:#9dbcf0;box-shadow:0 8px 20px rgba(37,99,235,.09)}
+.diagram-card.selected{border:2px solid #2563eb;background:linear-gradient(180deg,#fbfdff,#eef5ff);box-shadow:0 8px 22px rgba(37,99,235,.11)}
+.diagram-card.selected:after{
+ content:"✓";position:absolute;top:7px;right:7px;width:20px;height:20px;
+ border-radius:50%;background:#2563eb;color:#fff;font-size:12px;line-height:20px;font-weight:800
+}
+.diagram-card svg{width:100%;height:72px;display:block}
+.beam-choice-grid .diagram-card svg{height:82px}
+.diagram-card span{font-size:12px;font-weight:800;color:#334155;line-height:1.3}
+@media(max-width:760px){
+ .load-choice-grid{grid-template-columns:1fr 1fr}
+ .section-choice-grid{grid-template-columns:1fr 1fr}
+}
+
+
+select optgroup{
+  font-weight:800;
+  color:#334155;
+  background:#f1f5f9;
+}
+select option{
+  background:#ffffff;
+  color:#182235;
+}
+
+
+/* ===== 계산 결과 그래프 ===== */
+#beamCanvas{
+  background:linear-gradient(180deg,#ffffff,#f8fafc);
+  border:1px solid #dce3ec;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+
+/* ===== 결과 영역 개선 ===== */
+.result-box{
+  padding:20px 18px;
+  min-height:108px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:7px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#ffffff,#f5f8fc);
+  border:1px solid #d8e1ec;
+  box-shadow:0 8px 24px rgba(30,50,80,.07);
+}
+.result-box .value{
+  font-size:27px !important;
+  font-weight:800;
+  letter-spacing:-.4px;
+  color:#17243a;
+}
+.result-box .label{
+  font-size:12px;
+  font-weight:700;
+  color:#64748b;
+}
+.formula{
+  margin-top:10px;
+  padding:18px 20px;
+  min-height:88px;
+  border-radius:15px;
+  background:#f8fafc;
+  border:1px solid #dce4ee;
+  color:#17243a;
+  font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;
+  font-size:24px;
+  line-height:1.5;
+}
+.formula strong{
+  font-family:"Noto Sans KR","Pretendard","Malgun Gothic",sans-serif;
+  font-size:14px;
+  font-weight:800;
+  color:#475569;
+}
+.formula .frac{
+  margin-left:5px;
+}
+.frac .top,.frac .bottom{
+  padding-left:12px;
+  padding-right:12px;
+}
+#beamCanvas{
+  width:100%;
+  height:auto;
+  min-height:300px;
+  border-radius:16px;
+  display:block;
+}
+
+</style>
+</head>
+
+<body>
+<header>
+  <div class="container" style="margin:0 auto;">
+    <h1>보 처짐 계산기</h1>
+    <p>AI 응용제조 · 보의 처짐 및 굽힘 계산</p>
+  </div>
+</header>
+
+<div class="container">
+<select id="beamType" style="display:none">
+<option value="cantilever" selected>외팔보</option><option value="simply">단순지지보</option></select>
+<select id="loadCase" style="display:none">
+<option value="point" selected>집중하중</option><option value="udl">등분포하중</option>
+<option value="triFixed">삼각형 하중(고정단 최대)</option><option value="triFree">삼각형 하중(자유단 최대)</option><option value="moment">모멘트 하중</option></select>
+<select id="sectionType" style="display:none">
+<option value="rect" selected>사각형</option><option value="circle">원형</option><option value="i">I형</option><option value="tube">중공 사각형</option></select>
+  <div class="grid">
+
+    <!-- 입력 -->
+    <section class="card">
+      <h2>① 보 및 하중 설정</h2>
+
+      <div class="visual-choice-block">
+        <label>보 종류</label>
+        <div class="diagram-grid beam-choice-grid">
+          <div class="diagram-card selected" data-beam="cantilever" onclick="selectBeam(this)">
+            <svg viewBox="0 0 280 115" aria-label="외팔보 그림">
+              <rect x="25" y="16" width="13" height="72" rx="2" fill="#718096"/>
+              <g stroke="#718096" stroke-width="1.4">
+                <line x1="25" y1="20" x2="10" y2="30"/><line x1="25" y1="32" x2="10" y2="42"/>
+                <line x1="25" y1="44" x2="10" y2="54"/><line x1="25" y1="56" x2="10" y2="66"/>
+                <line x1="25" y1="68" x2="10" y2="78"/>
+              </g>
+              <rect x="38" y="49" width="210" height="10" rx="3" fill="#94a3b8"/>
+              <line x1="205" y1="15" x2="205" y2="43" stroke="#1e293b" stroke-width="3"/>
+              <polygon points="198,39 212,39 205,51" fill="#1e293b"/>
+              <text x="201" y="12" font-size="14" fill="#1e293b">P</text>
+              <line x1="40" y1="82" x2="248" y2="82" stroke="#64748b"/>
+              <line x1="40" y1="77" x2="40" y2="87" stroke="#64748b"/>
+              <line x1="248" y1="77" x2="248" y2="87" stroke="#64748b"/>
+              <text x="140" y="101" font-size="14" fill="#475569">L</text>
+            </svg>
+            <span>외팔보</span>
+          </div>
+
+          <div class="diagram-card" data-beam="simply" onclick="selectBeam(this)">
+            <svg viewBox="0 0 280 115" aria-label="단순지지보 그림">
+              <rect x="38" y="49" width="210" height="10" rx="3" fill="#94a3b8"/>
+              <polygon points="52,59 39,78 65,78" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+              <circle cx="232" cy="72" r="8" fill="#fff" stroke="#475569" stroke-width="1.5"/>
+              <circle cx="247" cy="72" r="8" fill="#fff" stroke="#475569" stroke-width="1.5"/>
+              <line x1="143" y1="15" x2="143" y2="44" stroke="#1e293b" stroke-width="3"/>
+              <polygon points="136,40 150,40 143,51" fill="#1e293b"/>
+              <text x="138" y="12" font-size="14">P</text>
+              <line x1="42" y1="88" x2="246" y2="88" stroke="#64748b"/>
+              <text x="140" y="106" font-size="14" fill="#475569">L</text>
+            </svg>
+            <span>단순지지보</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-choice-block">
+        <label>하중 종류</label>
+        <div class="diagram-grid load-choice-grid">
+          <div class="diagram-card selected" data-load="point" onclick="selectLoad(this)">
+            <svg viewBox="0 0 280 100">
+              <rect x="30" y="48" width="220" height="10" rx="3" fill="#94a3b8"/>
+              <line x1="140" y1="12" x2="140" y2="43" stroke="#1e293b" stroke-width="3"/>
+              <polygon points="133,39 147,39 140,50" fill="#1e293b"/>
+              <text x="135" y="10" font-size="14">P</text>
+              <text x="136" y="82" font-size="13" fill="#475569">L</text>
+            </svg>
+            <span>집중하중</span>
+          </div>
+
+          <div class="diagram-card" data-load="udl" onclick="selectLoad(this)">
+            <svg viewBox="0 0 280 100">
+              <rect x="30" y="48" width="220" height="10" rx="3" fill="#94a3b8"/>
+              <text x="136" y="12" font-size="14">w</text>
+              <g stroke="#1e293b" stroke-width="2">
+                <line x1="45" y1="20" x2="45" y2="43"/><line x1="78" y1="20" x2="78" y2="43"/>
+                <line x1="111" y1="20" x2="111" y2="43"/><line x1="144" y1="20" x2="144" y2="43"/>
+                <line x1="177" y1="20" x2="177" y2="43"/><line x1="210" y1="20" x2="210" y2="43"/>
+                <line x1="243" y1="20" x2="243" y2="43"/>
+              </g>
+              <g fill="#1e293b">
+                <path d="M40 39l5 8 5-8z"/><path d="M73 39l5 8 5-8z"/><path d="M106 39l5 8 5-8z"/>
+                <path d="M139 39l5 8 5-8z"/><path d="M172 39l5 8 5-8z"/><path d="M205 39l5 8 5-8z"/><path d="M238 39l5 8 5-8z"/>
+              </g>
+              <text x="136" y="82" font-size="13" fill="#475569">L</text>
+            </svg>
+            <span>등분포하중</span>
+          </div>
+
+          <div class="diagram-card" data-load="triFixed" onclick="selectLoad(this)">
+            <svg viewBox="0 0 280 100">
+              <rect x="30" y="48" width="220" height="10" rx="3" fill="#94a3b8"/>
+              <line x1="40" y1="15" x2="245" y2="45" stroke="#1e293b" stroke-width="2"/>
+              <g stroke="#1e293b" stroke-width="2">
+                <line x1="40" y1="16" x2="40" y2="43"/><line x1="74" y1="21" x2="74" y2="43"/>
+                <line x1="108" y1="26" x2="108" y2="43"/><line x1="142" y1="31" x2="142" y2="43"/>
+                <line x1="176" y1="36" x2="176" y2="43"/><line x1="210" y1="41" x2="210" y2="43"/>
+              </g>
+              <text x="42" y="12" font-size="14">w</text>
+              <text x="136" y="82" font-size="13" fill="#475569">L</text>
+            </svg>
+            <span>삼각형 하중<br>(고정단 최대)</span>
+          </div>
+
+          <div class="diagram-card" data-load="triFree" onclick="selectLoad(this)">
+            <svg viewBox="0 0 280 100">
+              <rect x="30" y="48" width="220" height="10" rx="3" fill="#94a3b8"/>
+              <line x1="40" y1="45" x2="245" y2="15" stroke="#1e293b" stroke-width="2"/>
+              <g stroke="#1e293b" stroke-width="2">
+                <line x1="40" y1="45" x2="40" y2="45"/><line x1="74" y1="40" x2="74" y2="43"/>
+                <line x1="108" y1="35" x2="108" y2="43"/><line x1="142" y1="30" x2="142" y2="43"/>
+                <line x1="176" y1="25" x2="176" y2="43"/><line x1="210" y1="20" x2="210" y2="43"/>
+                <line x1="245" y1="15" x2="245" y2="43"/>
+              </g>
+              <text x="232" y="12" font-size="14">w</text>
+              <text x="136" y="82" font-size="13" fill="#475569">L</text>
+            </svg>
+            <span>삼각형 하중<br>(자유단 최대)</span>
+          </div>
+
+          <div class="diagram-card" data-load="moment" onclick="selectLoad(this)">
+            <svg viewBox="0 0 280 100">
+              <rect x="30" y="48" width="220" height="10" rx="3" fill="#94a3b8"/>
+              <path d="M225 44 A27 27 0 1 0 235 18" fill="none" stroke="#1e293b" stroke-width="3"/>
+              <polygon points="235,17 224,17 231,28" fill="#1e293b"/>
+              <text x="236" y="14" font-size="14">M</text>
+              <text x="136" y="82" font-size="13" fill="#475569">L</text>
+            </svg>
+            <span>모멘트 하중</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>보 길이 <span class="unit">L [m]</span></label>
+          <input id="L" type="number" value="2" min="0.001" step="0.01">
+        </div>
+
+        <div>
+          <label>하중 <span class="unit" id="loadUnit">P [N]</span></label>
+          <input id="load" type="number" value="1000" min="0" step="10">
+        </div>
+      </div>
+
+      <div id="positionField">
+        <label>하중 위치 <span class="unit">a [m] · 왼쪽 지점 기준</span></label>
+        <input id="a" type="number" value="1" min="0" step="0.01">
+      </div>
+
+      <h2 style="margin-top:22px;">② 단면 선택</h2>
+
+      <div class="diagram-grid section-choice-grid">
+        <div class="diagram-card selected" data-section="rect" onclick="selectSection(this)">
+          <svg viewBox="0 0 100 90"><rect x="32" y="12" width="36" height="58" fill="#94a3b8" stroke="#334155" stroke-width="2"/>
+          <text x="45" y="84" font-size="12">b</text><text x="72" y="45" font-size="12">h</text></svg>
+          <span>사각형</span>
+        </div>
+        <div class="diagram-card" data-section="circle" onclick="selectSection(this)">
+          <svg viewBox="0 0 100 90"><circle cx="50" cy="42" r="27" fill="#94a3b8" stroke="#334155" stroke-width="2"/>
+          <text x="45" y="83" font-size="12">d</text></svg>
+          <span>원형</span>
+        </div>
+        <div class="diagram-card" data-section="i" onclick="selectSection(this)">
+          <svg viewBox="0 0 100 90"><path d="M20 13H80V27H59V63H80V77H20V63H41V27H20Z" fill="#94a3b8" stroke="#334155" stroke-width="2"/></svg>
+          <span>I형</span>
+        </div>
+        <div class="diagram-card" data-section="tube" onclick="selectSection(this)">
+          <svg viewBox="0 0 100 90"><rect x="20" y="13" width="60" height="60" fill="#94a3b8" stroke="#334155" stroke-width="8"/>
+          <rect x="32" y="25" width="36" height="36" fill="#fff"/></svg>
+          <span>중공 사각형</span>
+        </div>
+      </div>
+
+      <div id="shapeFields"></div>
+
+      <h2 style="margin-top:22px;">③ 재료 선택</h2>
+
+      <label>재료 선택</label>
+      <select id="material">
+        <optgroup label="철계 재료">
+          <option value="200e9">일반 강철 · E = 200 GPa</option>
+          <option value="193e9">스테인리스강 · E = 193 GPa</option>
+          <option value="110e9">주철 · E = 110 GPa</option>
+        </optgroup>
+
+        <optgroup label="비철 금속">
+          <option value="70e9">알루미늄 · E = 70 GPa</option>
+          <option value="117e9">구리 · E = 117 GPa</option>
+          <option value="100e9">황동 · E = 100 GPa</option>
+          <option value="114e9">티타늄 합금 · E = 114 GPa</option>
+        </optgroup>
+
+        <optgroup label="플라스틱">
+          <option value="2.1e9">ABS 플라스틱 · E = 2.1 GPa</option>
+          <option value="3.0e9">PVC · E = 3.0 GPa</option>
+          <option value="3.2e9">아크릴(PMMA) · E = 3.2 GPa</option>
+          <option value="2.3e9">폴리카보네이트(PC) · E = 2.3 GPa</option>
+          <option value="2.5e9">나일론(PA) · E = 2.5 GPa</option>
+        </optgroup>
+
+        <optgroup label="기타 일반 재료">
+          <option value="10e9">목재 · E = 10 GPa</option>
+          <option value="25e9">콘크리트 · E = 25 GPa</option>
+          <option value="70e9">유리 · E = 70 GPa</option>
+        </optgroup>
+      </select>
+
+      <button onclick="calculate()">계산하기</button>
+      <div id="message" class="message"></div>
+    </section>
+
+    <!-- 결과 -->
+    <section class="card">
+      <h2>④ 계산 결과</h2>
+
+      <div class="result-grid">
+        <div class="result-box">
+          <span>최대 처짐</span>
+          <strong id="deflection">-</strong>
+        </div>
+        <div class="result-box">
+          <span>최대 굽힘모멘트</span>
+          <strong id="momentResult">-</strong>
+        </div>
+        <div class="result-box">
+          <span>최대 굽힘응력</span>
+          <strong id="stress">-</strong>
+        </div>
+        <div class="result-box">
+          <span>최대 처짐 위치 x</span>
+          <strong id="positionResult">-</strong>
+        </div>
+      </div>
+
+      <div class="formula" id="formula">
+        계산식을 선택하면 여기에 표시됩니다.
+      </div>
+
+      <p class="note">
+        ※ 현재 기본 버전은 이미지에 제시된 외팔보(외팔보) 하중 케이스를 중심으로 계산합니다.
+        단순지지보 공식은 다음 수정 단계에서 추가할 수 있습니다.
+      </p>
+    </section>
+
+    <!-- 시각화 -->
+    <section class="card full">
+      <h2>⑤ 보 변형 시각화</h2>
+      <canvas id="beamCanvas" width="1100" height="330"></canvas>
+      <p class="note">
+        지지조건, 하중 위치, 하중 방향과 함께 계산된 처짐곡선을 그래프로 표시합니다.
+        실제 변형량보다 보기 쉽게 확대하여 표시합니다.
+      </p>
+    </section>
+
+  </div>
+</div>
+
+
+<script>
+function selectBeam(card){
+  document.querySelectorAll("[data-beam]").forEach(x=>x.classList.remove("selected"));
+  card.classList.add("selected");
+  document.getElementById("beamType").value = card.dataset.beam;
+  calculate();
+}
+function selectLoad(card){
+  document.querySelectorAll("[data-load]").forEach(x=>x.classList.remove("selected"));
+  card.classList.add("selected");
+  document.getElementById("loadCase").value = card.dataset.load;
+  updateLoadFields();
+  calculate();
+}
+function selectSection(card){
+  document.querySelectorAll("[data-section]").forEach(x=>x.classList.remove("selected"));
+  card.classList.add("selected");
+  document.getElementById("sectionType").value = card.dataset.section;
+  updateShapeFields();
+  calculate();
+}
+
+const sectionType = document.getElementById("sectionType");
+const loadCase = document.getElementById("loadCase");
+const beamType = document.getElementById("beamType");
+
+function updateShapeFields(){
+  const type = sectionType.value;
+  const box = document.getElementById("shapeFields");
+
+  if(type === "rect"){
+    box.innerHTML = `<div class="row">
+      <div><label>폭 b <span class="unit">[mm]</span></label><input id="b" type="number" value="50" min="0.001"></div>
+      <div><label>높이 h <span class="unit">[mm]</span></label><input id="h" type="number" value="100" min="0.001"></div>
+    </div>`;
+  }
+  if(type === "circle"){
+    box.innerHTML = `<label>직경 d <span class="unit">[mm]</span></label>
+      <input id="d" type="number" value="50" min="0.001">`;
+  }
+  if(type === "i"){
+    box.innerHTML = `<div class="row">
+      <div><label>플랜지 폭 b <span class="unit">[mm]</span></label><input id="b" type="number" value="80" min="0.001"></div>
+      <div><label>전체 높이 h <span class="unit">[mm]</span></label><input id="h" type="number" value="120" min="0.001"></div>
+    </div>
+    <div class="row">
+      <div><label>웹 두께 t<sub>w</sub> <span class="unit">[mm]</span></label><input id="tw" type="number" value="6" min="0.001"></div>
+      <div><label>플랜지 두께 t<sub>f</sub> <span class="unit">[mm]</span></label><input id="tf" type="number" value="8" min="0.001"></div>
+    </div>`;
+  }
+  if(type === "tube"){
+    box.innerHTML = `<div class="row">
+      <div><label>외부 폭 B <span class="unit">[mm]</span></label><input id="B" type="number" value="60" min="0.001"></div>
+      <div><label>외부 높이 H <span class="unit">[mm]</span></label><input id="H" type="number" value="100" min="0.001"></div>
+    </div>
+    <label>벽 두께 t <span class="unit">[mm]</span></label>
+    <input id="t" type="number" value="5" min="0.001">`;
+  }
+}
+
+function updateLoadFields(){
+  const type = loadCase.value;
+  const position = document.getElementById("positionField");
+  const unit = document.getElementById("loadUnit");
+
+  if(type === "point"){
+    position.style.display = "block";
+    unit.textContent = "P [N]";
+  }else if(type === "moment"){
+    position.style.display = "none";
+    unit.textContent = "M [N·m]";
+  }else{
+    position.style.display = "none";
+    unit.textContent = "w [N/m]";
+  }
+}
+
+function getSection(){
+  const type = sectionType.value;
+  let I=0, c=0;
+
+  if(type==="rect"){
+    const b=Number(document.getElementById("b").value)/1000;
+    const h=Number(document.getElementById("h").value)/1000;
+    I=b*h**3/12; c=h/2;
+  }
+  if(type==="circle"){
+    const d=Number(document.getElementById("d").value)/1000;
+    I=Math.PI*d**4/64; c=d/2;
+  }
+  if(type==="i"){
+    const b=Number(document.getElementById("b").value)/1000;
+    const h=Number(document.getElementById("h").value)/1000;
+    const tw=Number(document.getElementById("tw").value)/1000;
+    const tf=Number(document.getElementById("tf").value)/1000;
+    I=(b*h**3-(b-tw)*(h-2*tf)**3)/12; c=h/2;
+  }
+  if(type==="tube"){
+    const B=Number(document.getElementById("B").value)/1000;
+    const H=Number(document.getElementById("H").value)/1000;
+    const t=Number(document.getElementById("t").value)/1000;
+    I=(B*H**3-(B-2*t)*(H-2*t)**3)/12; c=H/2;
+  }
+  return {I,c};
+}
+
+/* 하중 분포: x 위치에서의 분포하중 */
+function distributedLoad(x,L,type,w){
+  if(type==="udl") return w;
+  if(type==="triFixed") return w*(1-x/L);
+  if(type==="triFree") return w*(x/L);
+  return 0;
+}
+
+/* 수치적 적분으로 하중의 합력과 합력 작용점 계산 */
+function integrateLoad(L,type,w,N=800){
+  if(type==="point" || type==="moment") return {R:0,xR:0};
+  let R=0, Q=0;
+  const dx=L/N;
+  for(let i=0;i<=N;i++){
+    const x=i*dx;
+    const q=distributedLoad(x,L,type,w);
+    const coef=(i===0 || i===N)?0.5:1;
+    R += q*coef*dx;
+    Q += q*x*coef*dx;
+  }
+  return {R, xR:R ? Q/R : 0};
+}
+
+/* 지점반력 계산 */
+function reactions(L,type,load,a){
+  if(type==="moment") return {RA:0,RB:0};
+  if(type==="point"){
+    return {RA:load*(L-a)/L, RB:load*a/L};
+  }
+  const f=integrateLoad(L,type,load);
+  return {RA:f.R*(L-f.xR)/L, RB:f.R*f.xR/L};
+}
+
+/* 단면력 M(x). 부호는 처짐곡선 표시와 무관하며 절댓값으로 최대값을 판단 */
+function bendingMoment(x,L,type,load,a,support){
+  if(support==="cantilever"){
+    if(type==="point") return load*(a-x>0 ? a-x : 0);
+    if(type==="moment") return load;
+    const N=600, dx=(L-x)/N;
+    let M=0;
+    for(let i=0;i<=N;i++){
+      const s=x+i*dx;
+      const q=distributedLoad(s,L,type,load);
+      const coef=(i===0||i===N)?0.5:1;
+      M += q*(s-x)*coef*dx;
+    }
+    return M;
+  }
+
+  const r=reactions(L,type,load,a);
+  if(type==="point") return r.RA*x - load*Math.max(0,x-a);
+  if(type==="moment"){
+    /* 적용 모멘트는 우측단에 작용하는 것으로 모델링 */
+    return r.RA*x;
+  }
+  const N=600, dx=x/N;
+  let Q=0;
+  for(let i=0;i<=N;i++){
+    const s=i*dx;
+    const q=distributedLoad(s,L,type,load);
+    const coef=(i===0||i===N)?0.5:1;
+    Q += q*(x-s)*coef*dx;
+  }
+  return r.RA*x-Q;
+}
+
+/* 보의 처짐곡선 계산.
+   M/EI를 수치적분하고 경계조건으로 초기 기울기를 보정한다. */
+function solveDeflection(L,type,load,a,E,I,support,N=500){
+  const xs=[], Ms=[], k=[];
+  for(let i=0;i<=N;i++){
+    const x=L*i/N;
+    xs.push(x);
+    const M=bendingMoment(x,L,type,load,a,support);
+    Ms.push(M);
+    k.push(M/(E*I));
+  }
+
+  const dx=L/N;
+  const rawY=[0], slopes=[0];
+  for(let i=1;i<=N;i++){
+    slopes[i]=slopes[i-1]+0.5*(k[i-1]+k[i])*dx;
+    rawY[i]=rawY[i-1]+0.5*(slopes[i-1]+slopes[i])*dx;
+  }
+
+  if(support==="simply"){
+    const correction=rawY[N]/L;
+    const ys=rawY.map((y,i)=>y-correction*xs[i]);
+    return {xs,ys,Ms};
+  }else{
+    return {xs,ys:rawY.map(y=>-y),Ms};
+  }
+}
+
+function fmtDeflection(m){
+  const mm=Math.abs(m)*1000;
+  if(mm<0.001) return mm.toFixed(5)+" mm";
+  if(mm<10) return mm.toFixed(3)+" mm";
+  return mm.toFixed(2)+" mm";
+}
+
+function calculate(){
+  const L=Number(document.getElementById("L").value);
+  const load=Number(document.getElementById("load").value);
+  const a=Number(document.getElementById("a").value);
+  const E=Number(document.getElementById("material").value);
+  const type=loadCase.value;
+  const support=beamType.value;
+  const msg=document.getElementById("message");
+  msg.style.display="none";
+
+  if(!Number.isFinite(L)||L<=0||!Number.isFinite(load)||load<0){
+    showError("보 길이와 하중 값을 올바르게 입력해주세요."); return;
+  }
+  if(type==="point" && (!Number.isFinite(a)||a<0||a>L)){
+    showError("하중 위치 a는 0 ≤ a ≤ L 범위여야 합니다."); return;
+  }
+
+  const {I,c}=getSection();
+  if(!Number.isFinite(I)||I<=0||!Number.isFinite(c)||c<=0){
+    showError("단면 치수를 확인해주세요."); return;
+  }
+
+  const sol=solveDeflection(L,type,load,a,E,I,support);
+  let maxDef=0, maxIdx=0, maxM=0, maxMIdx=0;
+
+  sol.ys.forEach((y,i)=>{
+    if(Math.abs(y)>Math.abs(maxDef)){maxDef=y;maxIdx=i;}
+    if(Math.abs(sol.Ms[i])>Math.abs(maxM)){maxM=sol.Ms[i];maxMIdx=i;}
+  });
+
+  const maxDefAbs=Math.abs(maxDef);
+  const maxMomentAbs=Math.abs(maxM);
+  const stress=maxMomentAbs*c/I;
+  const defPos=sol.xs[maxIdx];
+
+  document.getElementById("deflection").textContent=fmtDeflection(maxDefAbs);
+  document.getElementById("momentResult").textContent=maxMomentAbs.toFixed(2)+" N·m";
+  document.getElementById("stress").textContent=(stress/1e6).toFixed(3)+" MPa";
+  document.getElementById("positionResult").textContent=defPos.toFixed(3)+" m";
+
+  let formulaText="";
+  if(support==="cantilever"){
+    if(type==="point") formulaText='<span class="frac"><span class="top">Pa<sup>2</sup>(3L−a)</span><span class="bottom">6EI</span></span>';
+    if(type==="udl") formulaText='<span class="frac"><span class="top">wL<sup>4</sup></span><span class="bottom">8EI</span></span>';
+    if(type==="triFixed") formulaText='<span class="frac"><span class="top">wL<sup>4</sup></span><span class="bottom">30EI</span></span>';
+    if(type==="triFree") formulaText='<span class="frac"><span class="top">11wL<sup>4</sup></span><span class="bottom">120EI</span></span>';
+    if(type==="moment") formulaText='<span class="frac"><span class="top">ML<sup>2</sup></span><span class="bottom">2EI</span></span>';
+  }else{
+    if(type==="point"){
+      if(Math.abs(a-L/2)<1e-9)
+        formulaText='<span class="frac"><span class="top">PL<sup>3</sup></span><span class="bottom">48EI</span></span> · (중앙 집중하중)';
+      else
+        formulaText='일반 위치 집중하중의 처짐곡선을 수치해석하여 최대값을 계산';
+    }
+    if(type==="udl") formulaText='<span class="frac"><span class="top">5wL<sup>4</sup></span><span class="bottom">384EI</span></span> · (등분포하중)';
+    if(type==="triFixed" || type==="triFree") formulaText='삼각형 분포하중의 처짐곡선을 수치해석하여 최대값을 계산';
+    if(type==="moment") formulaText='단순지지보의 단부 모멘트 조건을 수치해석하여 계산';
+  }
+  document.getElementById("formula").innerHTML="<strong>최대 처짐 = </strong>"+formulaText;
+
+  drawBeamGraph(L,a,type,support,sol,maxIdx);
+}
+
+function showError(text){
+  const msg=document.getElementById("message");
+  msg.textContent=text;
+  msg.style.display="block";
+}
+
+function drawBeamGraph(L,a,type,support,sol,maxIdx){
+  const canvas=document.getElementById("beamCanvas");
+  const ctx=canvas.getContext("2d");
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // 배경
+  ctx.fillStyle="#fbfcfe";
+  ctx.fillRect(0,0,W,H);
+
+  const left=75, right=W-35, baseY=155, bottom=H-45;
+  const plotW=right-left;
+
+  // 제목
+  ctx.fillStyle="#1e293b";
+  ctx.font="700 17px Arial";
+  ctx.fillText("보 변형 시각화",left,24);
+  ctx.fillStyle="#64748b";
+  ctx.font="12px Arial";
+  ctx.fillText("파란색: 변형된 보  ·  회색: 원래 보",left,43);
+
+  // 기준선 / 치수선
+  ctx.strokeStyle="#e2e8f0";
+  ctx.lineWidth=1;
+  ctx.setLineDash([5,5]);
+  ctx.beginPath();
+  ctx.moveTo(left,baseY);ctx.lineTo(right,baseY);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 원래 보
+  ctx.strokeStyle="#94a3b8";
+  ctx.lineWidth=6;
+  ctx.lineCap="round";
+  ctx.beginPath();
+  ctx.moveTo(left,baseY);ctx.lineTo(right,baseY);ctx.stroke();
+
+  // 지지조건
+  ctx.strokeStyle="#475569";
+  ctx.fillStyle="#475569";
+  ctx.lineWidth=2;
+  if(support==="cantilever"){
+    ctx.fillRect(left-13,baseY-50,13,100);
+    for(let i=0;i<10;i++){
+      ctx.beginPath();
+      ctx.moveTo(left-13,baseY-43+i*9);
+      ctx.lineTo(left-28,baseY-33+i*9);
+      ctx.stroke();
+    }
+    ctx.font="12px Arial";
+    ctx.fillText("고정단",left-38,baseY+67);
+  }else{
+    ctx.beginPath();
+    ctx.moveTo(left,baseY+4);ctx.lineTo(left-17,baseY+28);ctx.lineTo(left+17,baseY+28);ctx.closePath();ctx.fill();
+    ctx.beginPath();
+    ctx.arc(right,baseY+14,10,0,Math.PI*2);ctx.stroke();
+    ctx.fillText("지지점",left-16,baseY+48);
+  }
+
+  // 처짐곡선: 항상 아래쪽으로 표시
+  const maxAbs=Math.max(...sol.ys.map(v=>Math.abs(v)),1e-12);
+  const amp=Math.min(105,Math.max(45,H*0.27));
+  const yScale=amp/maxAbs;
+
+  ctx.strokeStyle="#2563eb";
+  ctx.lineWidth=4;
+  ctx.lineCap="round";
+  ctx.lineJoin="round";
+  ctx.beginPath();
+  sol.xs.forEach((x,i)=>{
+    const px=left+(x/L)*plotW;
+    const py=baseY+Math.abs(sol.ys[i])*yScale;
+    if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  });
+  ctx.stroke();
+
+  // 원래 보와 변형 보 사이 연결선
+  ctx.strokeStyle="#bfdbfe";
+  ctx.lineWidth=1;
+  for(let i=0;i<sol.xs.length;i+=Math.max(1,Math.floor(sol.xs.length/35))){
+    const px=left+(sol.xs[i]/L)*plotW;
+    const py=baseY+Math.abs(sol.ys[i])*yScale;
+    ctx.beginPath();ctx.moveTo(px,baseY);ctx.lineTo(px,py);ctx.stroke();
+  }
+
+  // 최대 처짐점
+  const mx=left+(sol.xs[maxIdx]/L)*plotW;
+  const my=baseY+Math.abs(sol.ys[maxIdx])*yScale;
+  ctx.fillStyle="#2563eb";
+  ctx.beginPath();ctx.arc(mx,my,6,0,Math.PI*2);ctx.fill();
+
+  ctx.fillStyle="#1e40af";
+  ctx.font="700 12px Arial";
+  const labelX=Math.min(Math.max(mx+10,left+5),right-75);
+  ctx.fillText("최대 처짐",labelX,my+22);
+
+  // 하중 표시
+  ctx.strokeStyle="#334155";
+  ctx.fillStyle="#334155";
+  ctx.lineWidth=2;
+
+  if(type==="point"){
+    const lx=left+(a/L)*plotW;
+    ctx.beginPath();ctx.moveTo(lx,baseY-75);ctx.lineTo(lx,baseY-10);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(lx,baseY-8);ctx.lineTo(lx-7,baseY-20);ctx.lineTo(lx+7,baseY-20);ctx.closePath();ctx.fill();
+    ctx.font="700 13px Arial";ctx.fillText("P",lx+9,baseY-58);
+  }else if(type!=="moment"){
+    const w=Number(document.getElementById("load").value);
+    for(let i=0;i<=14;i++){
+      const lx=left+i*plotW/14;
+      const q=distributedLoad(L*i/14,L,type,w);
+      const h=type==="udl"?55:Math.max(9,55*q/Math.max(w,1));
+      ctx.beginPath();ctx.moveTo(lx,baseY-h);ctx.lineTo(lx,baseY-10);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(lx,baseY-8);ctx.lineTo(lx-4,baseY-16);ctx.lineTo(lx+4,baseY-16);ctx.closePath();ctx.fill();
+    }
+    ctx.font="700 13px Arial";ctx.fillText("w",left+plotW/2,baseY-62);
+  }else{
+    ctx.beginPath();
+    ctx.arc(right-20,baseY-6,22,Math.PI*0.25,Math.PI*1.55);
+    ctx.stroke();
+    ctx.font="700 13px Arial";ctx.fillText("M",right-11,baseY-32);
+  }
+
+  // 길이 치수선
+  const dimY=bottom-8;
+  ctx.strokeStyle="#94a3b8";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(left,dimY);ctx.lineTo(right,dimY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(left,dimY-6);ctx.lineTo(left,dimY+6);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(right,dimY-6);ctx.lineTo(right,dimY+6);ctx.stroke();
+  ctx.fillStyle="#64748b";ctx.font="12px Arial";
+  ctx.fillText("0",left-3,dimY+22);
+  ctx.fillText("L = "+L+" m",right-50,dimY+22);
+  ctx.fillText("x [m]",right-30,dimY+39);
+}
+
+document.getElementById("material").addEventListener("change",calculate);
+document.getElementById("L").addEventListener("input",calculate);
+document.getElementById("load").addEventListener("input",calculate);
+document.getElementById("a").addEventListener("input",calculate);
+loadCase.addEventListener("change",updateLoadFields);
+beamType.addEventListener("change",updateLoadFields);
+
+updateShapeFields();
+updateLoadFields();
+calculate();
+</script>
+
+</body>
+</html>
