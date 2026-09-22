@@ -333,14 +333,162 @@ select option{
   display:block;
 }
 
+
+/* ===== 테마 시스템 ===== */
+:root{
+  --page:#f1f4f8;
+  --surface:rgba(255,255,255,.96);
+  --surface-2:#f8fafc;
+  --text:#182235;
+  --muted:#64748b;
+  --border:#dce3ec;
+  --input:#ffffff;
+  --shadow:rgba(31,48,76,.09);
+  --accent:#2563eb;
+  --accent-2:#174fc7;
+  --canvas:#fbfcfe;
+}
+body.dark-theme{
+  --page:#0b1220;
+  --surface:rgba(17,25,39,.96);
+  --surface-2:#111c2e;
+  --text:#eef4ff;
+  --muted:#aab8cc;
+  --border:#2b3a50;
+  --input:#111c2e;
+  --shadow:rgba(0,0,0,.34);
+  --accent:#60a5fa;
+  --accent-2:#3b82f6;
+  --canvas:#111827;
+  background:
+    radial-gradient(circle at 8% 0%,rgba(59,130,246,.13),transparent 28%),
+    radial-gradient(circle at 92% 8%,rgba(45,212,191,.08),transparent 25%),
+    var(--page);
+  color:var(--text);
+}
+body.dark-theme header{
+  background:linear-gradient(135deg,#070d18,#14243b);
+}
+.header-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+.theme-toggle{
+  width:auto;
+  min-width:132px;
+  margin:0;
+  padding:10px 14px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  box-shadow:0 8px 22px rgba(0,0,0,.16);
+  backdrop-filter:blur(10px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:13px;
+}
+.theme-toggle:hover{background:rgba(255,255,255,.17)}
+body.dark-theme .card{
+  background:var(--surface);
+  border-color:var(--border);
+  box-shadow:0 18px 45px var(--shadow);
+}
+body.dark-theme .card h2{border-color:var(--border)}
+body.dark-theme .diagram-card{
+  background:linear-gradient(180deg,#172235,#111b2c);
+  border-color:#304158;
+}
+body.dark-theme .diagram-card span{color:#dbe7f7}
+body.dark-theme .diagram-card:hover{
+  border-color:#5b8fd4;
+  box-shadow:0 10px 26px rgba(0,0,0,.28);
+}
+body.dark-theme .diagram-card.selected{
+  border-color:#60a5fa;
+  background:linear-gradient(180deg,#1a2c47,#14243a);
+}
+body.dark-theme .diagram-card svg{filter:none}
+/* 선택용 보/하중 그림: 다크모드에서도 하중 화살표와 표기가 선명하게 보이도록 */
+body.dark-theme .diagram-card svg line{stroke:#e8f1ff !important}
+body.dark-theme .diagram-card svg polygon{fill:#e8f1ff !important;stroke:#e8f1ff !important}
+body.dark-theme .diagram-card svg path{stroke:#e8f1ff !important}
+body.dark-theme .diagram-card svg text{fill:#f3f7ff !important}
+body.dark-theme .diagram-card svg circle{stroke:#dbeafe !important}
+/* 보 자체는 너무 밝아지지 않게 유지 */
+body.dark-theme .diagram-card svg rect{filter:brightness(1.12)}
+body.dark-theme label{color:#dbe7f7}
+body.dark-theme input,
+body.dark-theme select{
+  background:var(--input);
+  color:var(--text);
+  border-color:var(--border);
+}
+body.dark-theme select optgroup{
+  background:#182438;
+  color:#e7eef8;
+}
+body.dark-theme select option{
+  background:#111c2e;
+  color:#eef4ff;
+}
+body.dark-theme .unit,
+body.dark-theme .note{color:var(--muted)}
+body.dark-theme .result-box{
+  background:linear-gradient(145deg,#172235,#111b2c);
+  border-color:var(--border);
+  box-shadow:0 10px 28px rgba(0,0,0,.22);
+}
+body.dark-theme .result-box .label,
+body.dark-theme .result-box span{color:#aebdd0}
+body.dark-theme .result-box .value,
+body.dark-theme .result-box strong{color:#f2f7ff}
+body.dark-theme .formula{
+  background:#111c2e;
+  border-color:var(--border);
+  color:#eef4ff;
+}
+body.dark-theme .formula strong{color:#aebdd0}
+body.dark-theme #beamCanvas{
+  background:linear-gradient(180deg,#111827,#0f172a);
+  border-color:#2b3a50;
+}
+body.dark-theme .message{
+  background:#3a2114;
+  color:#ffd7b5;
+  border:1px solid #70401f;
+}
+body.dark-theme button:not(.theme-toggle){
+  background:linear-gradient(135deg,#3b82f6,#2563eb);
+}
+body.dark-theme input:focus,
+body.dark-theme select:focus{
+  border-color:#60a5fa;
+  box-shadow:0 0 0 4px rgba(96,165,250,.12);
+}
+@media(max-width:600px){
+  .header-inner{align-items:flex-start}
+  .theme-toggle{min-width:116px;font-size:12px;padding:9px 11px}
+  header h1{font-size:23px}
+}
+
 </style>
 </head>
 
 <body>
 <header>
-  <div class="container" style="margin:0 auto;">
-    <h1>보 처짐 계산기</h1>
-    <p>AI 응용제조 · 보의 처짐 및 굽힘 계산</p>
+  <div class="container header-inner" style="margin:0 auto;">
+    <div>
+      <h1>보 처짐 계산기</h1>
+      <p>AI 응용제조 · 보의 처짐 및 굽힘 계산</p>
+    </div>
+    <button id="themeToggle" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="테마 변경">
+      <span id="themeIcon">☾</span><span id="themeText">다크 모드</span>
+    </button>
   </div>
 </header>
 
@@ -802,10 +950,11 @@ function solveDeflection(L,type,load,a,E,I,support,N=500){
 }
 
 function fmtDeflection(m){
-  const mm=Math.abs(m)*1000;
-  if(mm<0.001) return mm.toFixed(5)+" mm";
-  if(mm<10) return mm.toFixed(3)+" mm";
-  return mm.toFixed(2)+" mm";
+  const value=Math.abs(m)*1000;
+  if(value<0.001) return value.toFixed(6)+" mm";
+  if(value<0.01) return value.toFixed(5)+" mm";
+  if(value<1) return value.toFixed(3)+" mm";
+  return value.toFixed(2)+" mm";
 }
 
 function calculate(){
@@ -823,6 +972,40 @@ function calculate(){
   }
   if(type==="point" && (!Number.isFinite(a)||a<0||a>L)){
     showError("하중 위치 a는 0 ≤ a ≤ L 범위여야 합니다."); return;
+  }
+  if(!Number.isFinite(E)||E<=0){
+    showError("재료를 올바르게 선택해주세요."); return;
+  }
+  if(!Number.isFinite(load)||load<=0){
+    showError("하중은 0보다 큰 값을 입력해주세요."); return;
+  }
+
+  // 단면 입력값의 누락·음수·물리적으로 불가능한 치수를 검사
+  const requiredIds = {
+    rect:["b","h"], circle:["d"], i:["b","h","tw","tf"], tube:["B","H","t"]
+  }[sectionType.value] || [];
+  for(const id of requiredIds){
+    const v=Number(document.getElementById(id)?.value);
+    if(!Number.isFinite(v)||v<=0){
+      showError("단면 치수는 0보다 큰 값을 입력해주세요."); return;
+    }
+  }
+  if(sectionType.value==="i"){
+    const h=Number(document.getElementById("h").value);
+    const tf=Number(document.getElementById("tf").value);
+    const tw=Number(document.getElementById("tw").value);
+    const b=Number(document.getElementById("b").value);
+    if(2*tf>=h || tw>=b){
+      showError("I형 단면 치수를 확인해주세요. 플랜지 두께는 전체 높이의 절반보다 작고, 웹 두께는 폭보다 작아야 합니다."); return;
+    }
+  }
+  if(sectionType.value==="tube"){
+    const B=Number(document.getElementById("B").value);
+    const H=Number(document.getElementById("H").value);
+    const tt=Number(document.getElementById("t").value);
+    if(2*tt>=B || 2*tt>=H){
+      showError("중공 사각형의 두께는 폭과 높이의 절반보다 작아야 합니다."); return;
+    }
   }
 
   const {I,c}=getSection();
@@ -881,25 +1064,41 @@ function drawBeamGraph(L,a,type,support,sol,maxIdx){
   const canvas=document.getElementById("beamCanvas");
   const ctx=canvas.getContext("2d");
   const W=canvas.width, H=canvas.height;
+  const dark=document.body.classList.contains("dark-theme");
+  const C={
+    bg:dark ? "#111827" : "#fbfcfe",
+    title:dark ? "#f1f5f9" : "#1e293b",
+    muted:dark ? "#aebdd0" : "#64748b",
+    guide:dark ? "#334155" : "#e2e8f0",
+    original:dark ? "#94a3b8" : "#94a3b8",
+    support:dark ? "#cbd5e1" : "#475569",
+    deform:dark ? "#60a5fa" : "#2563eb",
+    deformLabel:dark ? "#93c5fd" : "#1e40af",
+    connector:dark ? "#4b6b91" : "#bfdbfe",
+    dimension:dark ? "#9fb4ca" : "#94a3b8",
+    dimensionText:dark ? "#e6eef8" : "#64748b",
+    load:dark ? "#f8fafc" : "#334155",
+    loadAccent:dark ? "#7dd3fc" : "#2563eb"
+  };
   ctx.clearRect(0,0,W,H);
 
   // 배경
-  ctx.fillStyle="#fbfcfe";
+  ctx.fillStyle=C.bg;
   ctx.fillRect(0,0,W,H);
 
   const left=75, right=W-35, baseY=155, bottom=H-45;
   const plotW=right-left;
 
   // 제목
-  ctx.fillStyle="#1e293b";
+  ctx.fillStyle=C.title;
   ctx.font="700 17px Arial";
   ctx.fillText("보 변형 시각화",left,24);
-  ctx.fillStyle="#64748b";
+  ctx.fillStyle=C.dimensionText;
   ctx.font="12px Arial";
   ctx.fillText("파란색: 변형된 보  ·  회색: 원래 보",left,43);
 
   // 기준선 / 치수선
-  ctx.strokeStyle="#e2e8f0";
+  ctx.strokeStyle=C.guide;
   ctx.lineWidth=1;
   ctx.setLineDash([5,5]);
   ctx.beginPath();
@@ -907,15 +1106,15 @@ function drawBeamGraph(L,a,type,support,sol,maxIdx){
   ctx.setLineDash([]);
 
   // 원래 보
-  ctx.strokeStyle="#94a3b8";
+  ctx.strokeStyle=C.dimension;
   ctx.lineWidth=6;
   ctx.lineCap="round";
   ctx.beginPath();
   ctx.moveTo(left,baseY);ctx.lineTo(right,baseY);ctx.stroke();
 
   // 지지조건
-  ctx.strokeStyle="#475569";
-  ctx.fillStyle="#475569";
+  ctx.strokeStyle=C.support;
+  ctx.fillStyle=C.support;
   ctx.lineWidth=2;
   if(support==="cantilever"){
     ctx.fillRect(left-13,baseY-50,13,100);
@@ -940,7 +1139,7 @@ function drawBeamGraph(L,a,type,support,sol,maxIdx){
   const amp=Math.min(105,Math.max(45,H*0.27));
   const yScale=amp/maxAbs;
 
-  ctx.strokeStyle="#2563eb";
+  ctx.strokeStyle=C.deform;
   ctx.lineWidth=4;
   ctx.lineCap="round";
   ctx.lineJoin="round";
@@ -953,7 +1152,7 @@ function drawBeamGraph(L,a,type,support,sol,maxIdx){
   ctx.stroke();
 
   // 원래 보와 변형 보 사이 연결선
-  ctx.strokeStyle="#bfdbfe";
+  ctx.strokeStyle=C.connector;
   ctx.lineWidth=1;
   for(let i=0;i<sol.xs.length;i+=Math.max(1,Math.floor(sol.xs.length/35))){
     const px=left+(sol.xs[i]/L)*plotW;
@@ -964,24 +1163,30 @@ function drawBeamGraph(L,a,type,support,sol,maxIdx){
   // 최대 처짐점
   const mx=left+(sol.xs[maxIdx]/L)*plotW;
   const my=baseY+Math.abs(sol.ys[maxIdx])*yScale;
-  ctx.fillStyle="#2563eb";
+  ctx.fillStyle=C.deform;
   ctx.beginPath();ctx.arc(mx,my,6,0,Math.PI*2);ctx.fill();
 
-  ctx.fillStyle="#1e40af";
+  ctx.fillStyle=C.deformLabel;
   ctx.font="700 12px Arial";
   const labelX=Math.min(Math.max(mx+10,left+5),right-75);
   ctx.fillText("최대 처짐",labelX,my+22);
 
   // 하중 표시
-  ctx.strokeStyle="#334155";
-  ctx.fillStyle="#334155";
-  ctx.lineWidth=2;
+  // 다크 모드에서는 하중 화살표/분포선을 밝게 표시해 배경과 확실히 구분
+  ctx.strokeStyle=C.load;
+  ctx.fillStyle=C.load;
+  ctx.lineWidth=2.5;
+  if(dark){
+    ctx.shadowColor="rgba(125,211,252,.28)";
+    ctx.shadowBlur=6;
+  }
 
   if(type==="point"){
     const lx=left+(a/L)*plotW;
     ctx.beginPath();ctx.moveTo(lx,baseY-75);ctx.lineTo(lx,baseY-10);ctx.stroke();
     ctx.beginPath();ctx.moveTo(lx,baseY-8);ctx.lineTo(lx-7,baseY-20);ctx.lineTo(lx+7,baseY-20);ctx.closePath();ctx.fill();
-    ctx.font="700 13px Arial";ctx.fillText("P",lx+9,baseY-58);
+    ctx.fillStyle=C.loadAccent;
+    ctx.font="700 14px Arial";ctx.fillText("P",lx+9,baseY-58);
   }else if(type!=="moment"){
     const w=Number(document.getElementById("load").value);
     for(let i=0;i<=14;i++){
@@ -991,25 +1196,85 @@ function drawBeamGraph(L,a,type,support,sol,maxIdx){
       ctx.beginPath();ctx.moveTo(lx,baseY-h);ctx.lineTo(lx,baseY-10);ctx.stroke();
       ctx.beginPath();ctx.moveTo(lx,baseY-8);ctx.lineTo(lx-4,baseY-16);ctx.lineTo(lx+4,baseY-16);ctx.closePath();ctx.fill();
     }
-    ctx.font="700 13px Arial";ctx.fillText("w",left+plotW/2,baseY-62);
+    ctx.fillStyle=C.loadAccent;
+    ctx.font="700 14px Arial";ctx.fillText("w",left+plotW/2,baseY-62);
   }else{
     ctx.beginPath();
     ctx.arc(right-20,baseY-6,22,Math.PI*0.25,Math.PI*1.55);
     ctx.stroke();
-    ctx.font="700 13px Arial";ctx.fillText("M",right-11,baseY-32);
+    ctx.fillStyle=C.loadAccent;
+    ctx.font="700 14px Arial";ctx.fillText("M",right-11,baseY-32);
+  }
+
+  ctx.shadowColor="transparent";
+  ctx.shadowBlur=0;
+
+  // 집중하중 위치 치수선: 왼쪽 기준 거리 a 표시
+  if(type==="point"){
+    const loadX=left+(a/L)*plotW;
+    const aY=baseY+48;
+    ctx.strokeStyle=C.dimension;
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(left,aY);
+    ctx.lineTo(loadX,aY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(left,aY-5);
+    ctx.lineTo(left,aY+5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(loadX,aY-5);
+    ctx.lineTo(loadX,aY+5);
+    ctx.stroke();
+    // 양방향 화살표
+    ctx.beginPath();
+    ctx.moveTo(left+8,aY);
+    ctx.lineTo(left+16,aY-4);
+    ctx.moveTo(left+8,aY);
+    ctx.lineTo(left+16,aY+4);
+    ctx.moveTo(loadX-8,aY);
+    ctx.lineTo(loadX-16,aY-4);
+    ctx.moveTo(loadX-8,aY);
+    ctx.lineTo(loadX-16,aY+4);
+    ctx.stroke();
+    ctx.fillStyle=C.dimensionText;
+    ctx.font="700 12px Arial";
+    const aText="a = "+a.toFixed(3)+" m";
+    const aTextW=ctx.measureText(aText).width;
+    ctx.fillText(aText,(left+loadX)/2-aTextW/2,aY-8);
   }
 
   // 길이 치수선
   const dimY=bottom-8;
-  ctx.strokeStyle="#94a3b8";ctx.lineWidth=1;
+  ctx.strokeStyle=C.dimension;ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(left,dimY);ctx.lineTo(right,dimY);ctx.stroke();
   ctx.beginPath();ctx.moveTo(left,dimY-6);ctx.lineTo(left,dimY+6);ctx.stroke();
   ctx.beginPath();ctx.moveTo(right,dimY-6);ctx.lineTo(right,dimY+6);ctx.stroke();
-  ctx.fillStyle="#64748b";ctx.font="12px Arial";
+  ctx.fillStyle=C.dimensionText;ctx.font="12px Arial";
   ctx.fillText("0",left-3,dimY+22);
   ctx.fillText("L = "+L+" m",right-50,dimY+22);
   ctx.fillText("x [m]",right-30,dimY+39);
 }
+
+
+function applyTheme(theme){
+  const dark=theme==="dark";
+  document.body.classList.toggle("dark-theme",dark);
+  const icon=document.getElementById("themeIcon");
+  const label=document.getElementById("themeText");
+  if(icon) icon.textContent=dark ? "☀" : "☾";
+  if(label) label.textContent=dark ? "라이트 모드" : "다크 모드";
+  localStorage.setItem("beamTheme",theme);
+  if(typeof calculate==="function") calculate();
+}
+
+function toggleTheme(){
+  applyTheme(document.body.classList.contains("dark-theme") ? "light" : "dark");
+}
+
+const savedTheme=localStorage.getItem("beamTheme") || "light";
+applyTheme(savedTheme);
 
 document.getElementById("material").addEventListener("change",calculate);
 document.getElementById("L").addEventListener("input",calculate);
